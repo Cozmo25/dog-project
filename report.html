@@ -13405,6 +13405,8 @@ AAAASUVORK5CYII=
 </ul>
 <p>Ideally, we would like 100% of human images with a detected face and 0% of dog images with a detected face.  You will see that our algorithm falls short of this goal, but still gives acceptable performance.  We extract the file paths for the first 100 images from each of the datasets and store them in the numpy arrays <code>human_files_short</code> and <code>dog_files_short</code>.</p>
 <p><strong>Answer:</strong></p>
+<p>Accuracy of face detector on human images is: 99.0%<br>
+Accuracy of face detector on dog images is: 89.0%</p>
 
 </div>
 </div>
@@ -13463,6 +13465,14 @@ Accuracy of face detector on dog images is: 89.0%
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Question 2:</strong> This algorithmic choice necessitates that we communicate to the user that we accept human images only when they provide a clear view of a face (otherwise, we risk having unneccessarily frustrated users!). In your opinion, is this a reasonable expectation to pose on the user? If not, can you think of a way to detect humans in images that does not necessitate an image with a clearly presented face?</p>
 <p><strong>Answer:</strong></p>
+<p>I believe that this is a reasonable expectation to impose on the user, however, work should be done to improve the face detector algo such that it can reliably detect faces in images which do not necessarily provide a clear view of the face.</p>
+<p>Haar-like features could be used to detect humans. A Haar-like feature considers neighbouring rectangular regions at a
+specific location in a detection window, sums up the pixel intensities in each region and calculates the difference
+between these sums. This difference is then used to categorize subsections of an image.</p>
+<p>Haar like features can be used in relation to face detection because commonly, the areas around the eyes are darker
+than the areas on the cheeks. One example of a Haar-like feature for face detection is therefore a set of two neighbouring rectangular areas above the eye and cheek regions.</p>
+<p><img src="images/opencv-python-face-eye-detection-tutorial.png" alt="alt text" title="Face Detector in OpenCV"></p>
+<p>Source: <a href="http://ds.cs.ut.ee/Members/artjom85/2014dss-course-media/Object%20detection%20using%20Haar-final.pdf">http://ds.cs.ut.ee/Members/artjom85/2014dss-course-media/Object%20detection%20using%20Haar-final.pdf</a></p>
 <p>We suggest the face detector from OpenCV as a potential way to detect human images in your algorithm, but you are free to explore other approaches, especially approaches that make use of deep learning :).  Please use the code cell below to design and test your own face detection algorithm.  If you decide to pursue this <em>optional</em> task, report performance on each of the datasets.</p>
 
 </div>
@@ -13638,6 +13648,8 @@ $$<p>Here, <code>nb_samples</code> is the number of samples, or number of images
 <li>What percentage of the images in <code>dog_files_short</code> have a detected dog?</li>
 </ul>
 <p><strong>Answer:</strong></p>
+<p>Accuracy of dog detector on human images is: 0.0%<br>
+Accuracy of dog detector on dog images is: 100.0%</p>
 
 </div>
 </div>
@@ -13830,6 +13842,11 @@ Accuracy of dog detector on dog images is: 100.0%
 <p><img src="images/sample_cnn.png" alt="Sample CNN"></p>
 <p><strong>Question 4:</strong> Outline the steps you took to get to your final CNN architecture and your reasoning at each step.  If you chose to use the hinted architecture above, describe why you think that CNN architecture should work well for the image classification task.</p>
 <p><strong>Answer:</strong></p>
+<p>My choice of architecture was based on the research done in this <a href="https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html">article</a>.</p>
+<p>The researchers were able to train a CNN to ~80% accuracy using only 2,000 images which were composed in a 50/50 split of cats &amp; dogs.</p>
+<p>The model consists of a stack of 3 convolution layers with a ReLU activation and followed by max-pooling layers. This is very similar to the architectures that Yann LeCun advocated in the 1990s for image classification (with the exception of ReLU).</p>
+<p>The flatten layer converts the 3D feature maps to 1D feature vectors.</p>
+<p>Two fully connected layers at the end with softmax activation and categorical_crossentropy as the loss measure to train the model should be relevant for classification acros the 133 possible breeds.</p>
 
 </div>
 </div>
@@ -15756,6 +15773,53 @@ Epoch 9/20
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Chosen-Model">Chosen Model<a class="anchor-link" href="#Chosen-Model">&#182;</a></h2><p>Based on my analysis of each of the models the Xception model performs the best, so I will select this model to use for predict dog breeds.</p>
+<p>Support for this decision includes:</p>
+<p>There are two major drawbacks with VGGNet:</p>
+<ul>
+<li>It is painfully slow to train.</li>
+<li>The network architecture weights themselves are quite large (in terms of disk/bandwidth).</li>
+</ul>
+<p>Due to its depth and number of fully-connected nodes, VGG is over 533MB for VGG16 and 574MB for VGG19. This makes deploying VGG a tiresome task.</p>
+<p>Also it's worth noting that Xception, slightly outperforms Inception V3 on the ImageNet dataset and the other models tested as described in this <a href="https://arxiv.org/pdf/1610.02357.pdf">paper</a> Table 1:</p>
+<table>
+<thead><tr>
+<th style="text-align:center">Architecture</th>
+<th style="text-align:right">Top-1 accuracy</th>
+<th style="text-align:right">Top-5 accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">VGG-16</td>
+<td style="text-align:right">0.715</td>
+<td style="text-align:right">0.901</td>
+</tr>
+<tr>
+<td style="text-align:center">ResNet-152</td>
+<td style="text-align:right">0.770</td>
+<td style="text-align:right">0.933</td>
+</tr>
+<tr>
+<td style="text-align:center">Inception V3</td>
+<td style="text-align:right">0.782</td>
+<td style="text-align:right">0.941</td>
+</tr>
+<tr>
+<td style="text-align:center">Xception</td>
+<td style="text-align:right">0.790</td>
+<td style="text-align:right">0.945</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
